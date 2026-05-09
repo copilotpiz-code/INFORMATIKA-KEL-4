@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Presensi</title>
+<link rel="stylesheet" href="style (1).css" />
+</head>
+<body class="gradient-bg">
+<div class="navbar">
+  <div class="logo">PRESENSI SISWA M2KK</div>
+  <nav>
+    <a href="beranda.html">Beranda</a>
+    <a href="profil.html">Profil</a>
+    <a href="presensi.html" class="active">Presensi</a>
+    <a href="#" onclick="logout();return false;">Keluar</a>
+  </nav>
+</div>
+<div class="container">
+  <div class="card" style="max-width:none;">
+    <h1>Presensi Siswa</h1>
+    <form id="presensiForm">
+      <label>Nama Lengkap</label>
+      <input type="text" id="pNama" required />
+      <div class="row">
+        <div>
+          <label>Nomor Presensi</label>
+          <input type="number" id="pNomor" required />
+        </div>
+        <div>
+          <label>Kelas</label>
+          <input type="text" id="pKelas" required />
+        </div>
+      </div>
+      <label>Status Kehadiran</label>
+      <select id="pStatus" required>
+        <option value="">-- Pilih --</option>
+        <option value="Masuk">Masuk</option>
+        <option value="Izin">Izin</option>
+        <option value="Sakit">Sakit</option>
+      </select>
+
+      <label>Foto (Kamera)</label>
+      <button type="button" class="btn-secondary" id="btnCamera">📷 Buka Kamera</button>
+      <video id="video" autoplay playsinline style="display:none;"></video>
+      <button type="button" class="btn-primary" id="btnCapture" style="display:none;">Ambil Foto</button>
+      <canvas id="canvas" style="display:none;"></canvas>
+      <img id="photoPreview" class="photo-preview" style="display:none; max-width:400px; border-radius:12px;" />
+
+      <label>Lokasi (Otomatis)</label>
+      <input type="text" id="pLokasi" readonly placeholder="Mendeteksi lokasi..." />
+
+      <button type="submit" class="btn-primary">Submit Presensi</button>
+    </form>
+  </div>
+</div>
+
+<footer>
+    <div class="footer-title">M2KK &mdash; Find Us On Social Media</div>
+    <div class="footer-links">
+      <a class="footer-link" href="https://www.instagram.com/man2kotakediri/" target="_blank">
+        <img src="logo_ig-removebg-preview.png" alt="Instagram">
+        Instagram
+      </a>
+      <a class="footer-link" href="https://www.facebook.com/man2kotakediri/?locale=id_ID" target="_blank">
+        <img src="logo_fb-removebg-preview.png" alt="Facebook">
+        Facebook
+      </a>
+      <a class="footer-link" href="https://www.youtube.com/channel/UCkmTT8_KX3FCO9s--pHe11A" target="_blank">
+        <img src="logo_yt-removebg-preview.png" alt="Twitter">
+        YouTube
+      </a>
+      <a class="footer-link" href="https://www.tiktok.com/@osisman2kotakediri" target="_blank">
+        <img src="logo_tiktok-removebg-preview.png" alt="Tiktok">
+        TikTok
+      </a>
+    </div>
+    <div class="copyright">&copy; 2026 MAN 2 KOTA KEDIRI. All rights reserved.</div>
+  </footer>
+  
+<script src="script.js"></script>
+<script>
+  const nis = requireLogin();
+  // Prefill from profile
+  const prof = getProfile(nis);
+  if (prof) {
+    document.getElementById('pNama').value = prof.nama || '';
+  }
+
+  // Lokasi otomatis
+  const lokasiInput = document.getElementById('pLokasi');
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      pos => { lokasiInput.value = `Lat: ${pos.coords.latitude.toFixed(5)}, Lng: ${pos.coords.longitude.toFixed(5)}`; },
+      err => { lokasiInput.value = 'Lokasi tidak terdeteksi'; }
+    );
+  } else {
+    lokasiInput.value = 'Geolocation tidak didukung';
+  }
+
+  // Kamera - hanya melalui aplikasi
+  let stream = null;
+  let photoData = null;
+  document.getElementById('btnCamera').onclick = async () => {
+    if (!isInApp()) {
+      alert('Fitur kamera hanya bisa dibuka melalui aplikasi (Install / Add to Home Screen terlebih dahulu).');
+      return;
+    }
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+      const video = document.getElementById('video');
+      video.srcObject = stream;
+      video.style.display = 'block';
+      document.getElementById('btnCapture').style.display = 'block';
+    } catch(e) { alert('Tidak dapat mengakses kamera: ' + e.message); }
+  };
+  document.getElementById('btnCapture').onclick = () => {
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    photoData = canvas.toDataURL('image/png');
+    const img = document.getElementById('photoPreview');
+    img.src = photoData; img.style.display = 'block';
+    if (stream) stream.getTracks().forEach(t => t.stop());
+    video.style.display = 'none';
+    document.getElementById('btnCapture').style.display = 'none';
+  };
+
+  document.getElementById('presensiForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const data = {
+      nama: document.getElementById('pNama').value,
+      nomor: document.getElementById('pNomor').value,
+      kelas: document.getElementById('pKelas').value,
+      status: document.getElementById('pStatus').value,
+      lokasi: lokasiInput.value,
+      foto: photoData,
+      waktu: new Date().toISOString(),
+      nis
+    };
+    const all = JSON.parse(localStorage.getItem('presensi') || '[]');
+    all.push(data);
+    localStorage.setItem('presensi', JSON.stringify(all));
+    showAlert('✓ Presensi Berhasil!');
+    setTimeout(() => e.target.reset(), 500);
+  });
+</script>
+</body>
+</html>

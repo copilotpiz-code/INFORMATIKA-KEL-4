@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Beranda</title>
+<link rel="stylesheet" href="style (1).css" />
+</head>
+<body class="gradient-bg">
+<div class="navbar">
+  <div class="logo">BERANDA</div>
+  <nav>
+    <a href="beranda.html" class="active">Beranda</a>
+    <a href="profil.html">Profil</a>
+    <a href="presensi.html">Presensi</a>
+    <a href="#" onclick="logout();return false;">Keluar</a>
+  </nav>
+</div>
+<div class="container">
+  <h1 class="welcome fade-in" id="welcome">Selamat Datang</h1>
+  <div class="datetime-box">
+    <div class="emoji">🔥</div>
+    <p class="quote">"Doakan Usaha-mu Serta Usahakan Doa-mu"</p>
+
+    <div class="clock" id="clock"></div>
+    <div class="date-text" id="dateText"></div>
+  </div>
+  <div class="gallery">
+    <img src="logo m2kk.png" alt="man" />
+    <img src="logo kemenag.png" alt="kemenag" />
+  </div>
+</div>
+<footer>
+    <div class="footer-title">M2KK &mdash; Find Us On Social Media</div>
+    <div class="footer-links">
+      <a class="footer-link" href="https://www.instagram.com/man2kotakediri/" target="_blank">
+        <img src="logo_ig-removebg-preview.png" alt="Instagram">
+        Instagram
+      </a>
+      <a class="footer-link" href="https://www.facebook.com/man2kotakediri/?locale=id_ID" target="_blank">
+        <img src="logo_fb-removebg-preview.png" alt="Facebook">
+        Facebook
+      </a>
+      <a class="footer-link" href="https://www.youtube.com/channel/UCkmTT8_KX3FCO9s--pHe11A" target="_blank">
+        <img src="logo_yt-removebg-preview.png" alt="Twitter">
+        YouTube
+      </a>
+      <a class="footer-link" href="https://www.tiktok.com/@osisman2kotakedirii" target="_blank">
+        <img src="logo_tiktok-removebg-preview.png" alt="Tiktok">
+        TikTok
+      </a>
+    </div>
+    <div class="copyright">&copy; 2026 MAN 2 KOTA KEDIRI. All rights reserved.</div>
+  </footer>
+<script src="script.js"></script>
+<script>
+  requireLogin();
+  startClock(document.getElementById('dateText'), document.getElementById('clock'));
+</script>
+</body>
+</html>

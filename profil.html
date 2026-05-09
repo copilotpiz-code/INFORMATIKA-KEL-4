@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Profil Siswa</title>
+<link rel="stylesheet" href="style (1).css" />
+</head>
+<body class="gradient-bg">
+<div class="navbar">
+  <div class="logo">PROFIL SISWA M2KK</div>
+  <nav>
+    <a href="beranda.html">Beranda</a>
+    <a href="profil.html" class="active">Profil</a>
+    <a href="presensi.html">Presensi</a>
+    <a href="#" onclick="logout();return false;">Keluar</a>
+  </nav>
+</div>
+<div class="container">
+  <div class="card" style="max-width:none;">
+    <h1>Profil Siswa</h1>
+    <p class="subtitle">Akun NIS: <strong id="accNis"></strong></p>
+    <form id="profilForm">
+      <label>Nama Lengkap</label>
+      <input type="text" id="nama" required />
+      <div class="row">
+        <div>
+          <label>NIS</label>
+          <input type="text" id="nis" maxlength="6" required />
+        </div>
+        <div>
+          <label>Nomor Telepon</label>
+          <input type="tel" id="telp" required />
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Tempat Lahir</label>
+          <input type="text" id="tempat" required />
+        </div>
+        <div>
+          <label>Tanggal Lahir</label>
+          <input type="date" id="tanggal" required />
+        </div>
+      </div>
+      <label>Alamat</label>
+      <textarea id="alamat" rows="3" required></textarea>
+      <button type="submit" class="btn-primary" id="submitBtn">Submit Profil</button>
+      <p class="error" id="lockedNote"></p>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal">
+    <h3>Apakah data sudah benar?</h3>
+    <p>Jika menekan "Sudah", data tidak dapat diubah lagi.</p>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="btnBelum">Belum</button>
+      <button class="btn-primary" id="btnSudah">Sudah</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+    <div class="footer-title">M2KK &mdash; Find Us On Social Media</div>
+    <div class="footer-links">
+      <a class="footer-link" href="https://www.instagram.com/man2kotakediri/" target="_blank">
+        <img src="logo_ig-removebg-preview.png" alt="Instagram">
+        Instagram
+      </a>
+      <a class="footer-link" href="https://www.facebook.com/man2kotakediri/?locale=id_ID" target="_blank">
+        <img src="logo_fb-removebg-preview.png" alt="Facebook">
+        Facebook
+      </a>
+      <a class="footer-link" href="https://www.youtube.com/channel/UCkmTT8_KX3FCO9s--pHe11A" target="_blank">
+        <img src="logo_yt-removebg-preview.png" alt="Twitter">
+        YouTube
+      </a>
+      <a class="footer-link" href="https://www.tiktok.com/@osisman2kotakediri" target="_blank">
+        <img src="logo_tiktok-removebg-preview.png" alt="Tiktok">
+        TikTok
+      </a>
+    </div>
+    <div class="copyright">&copy; 2026 MAN 2 KOTA KEDIRI. All rights reserved.</div>
+  </footer>
+
+<script src="script.js"></script>
+<script>
+  const nisAcc = requireLogin();
+  document.getElementById('accNis').textContent = nisAcc;
+  const form = document.getElementById('profilForm');
+  const fields = ['nama','nis','telp','tempat','tanggal','alamat'];
+  const submitBtn = document.getElementById('submitBtn');
+  const lockedNote = document.getElementById('lockedNote');
+
+  // load
+  const existing = getProfile(nisAcc);
+  if (existing) {
+    fields.forEach(f => { if (existing[f]) document.getElementById(f).value = existing[f]; });
+    if (existing._locked) lockProfile();
+  } else {
+    document.getElementById('nis').value = nisAcc;
+  }
+
+  function lockProfile() {
+    fields.forEach(f => document.getElementById(f).disabled = true);
+    submitBtn.style.display = 'none';
+    lockedNote.style.color = '#fff';
+    lockedNote.textContent = '✓ Profil terkunci. Data tidak dapat diubah.';
+  }
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    document.getElementById('confirmModal').classList.add('show');
+  });
+
+  document.getElementById('btnBelum').onclick = () => {
+    document.getElementById('confirmModal').classList.remove('show');
+    // simpan sementara, masih bisa diubah
+    const data = {}; fields.forEach(f => data[f] = document.getElementById(f).value);
+    saveProfile(nisAcc, data, false);
+    showAlert('Data disimpan sementara, masih bisa diubah');
+  };
+  document.getElementById('btnSudah').onclick = () => {
+    document.getElementById('confirmModal').classList.remove('show');
+    const data = {}; fields.forEach(f => data[f] = document.getElementById(f).value);
+    saveProfile(nisAcc, data, true);
+    lockProfile();
+    showAlert('Profil dikonfirmasi & dikaitkan dengan akun ' + nisAcc);
+  };
+</script>
+</body>
+</html>

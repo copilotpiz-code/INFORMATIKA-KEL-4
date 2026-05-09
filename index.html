@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Login Siswa</title>
+<link rel="stylesheet" href="style (1).css" />
+</head>
+<body class="gradient-bg center">
+  <div class="card">
+    <h1>Login Siswa</h1>
+    <p class="subtitle">Masuk dengan NIS Anda</p>
+    <form id="loginForm">
+      <label>Username (NIS - 6 digit angka)</label>
+      <input type="text" id="username" maxlength="6" pattern="\d{6}" placeholder="Contoh: 123456" required />
+      <label>Password (NIS + *)</label>
+      <input type="password" id="password" placeholder="Contoh: 123456*" required />
+      <button type="submit" class="btn-primary">Masuk</button>
+      <p class="error" id="loginError"></p>
+    </form>
+  </div>
+<script src="script.js"></script>
+<script>
+document.getElementById('loginForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const u = document.getElementById('username').value.trim();
+  const p = document.getElementById('password').value.trim();
+  const err = document.getElementById('loginError');
+  if(!/^\d{6}$/.test(u)){ err.textContent = 'NIS harus 6 digit angka'; return; }
+  if(p !== u + '*'){ err.textContent = 'Password salah (harus NIS + *)'; return; }
+  localStorage.setItem('nis', u);
+  window.location.href = 'beranda.html';
+});
+</script>
+</body>
+</html>
